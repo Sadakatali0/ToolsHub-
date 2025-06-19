@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Tools Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+        }
+        
+        .tab-btn.active {
+            background: #fff;
+            color: #1a2a6c;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tool-section {
+            background: rgba(255,255,255,0.92);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .tool-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tool-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .tool-header h2 {
+            font-size: 2rem;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .tool-header p {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tool-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .tool-controls {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .tool-preview {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+        }
+        
+        button {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .preview-container {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f9f9f9;
+            margin-bottom: 20px;
+        }
+        
+        .preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .result-box {
+            background: #f0f7ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .result-box h3 {
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+        
+        .all-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #eee;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .tool-card i {
+            font-size: 2.5rem;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            background: rgba(26, 42, 108, 0.1);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+        }
+        
+        .tool-card h3 {
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+        
+        .tool-card p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .tool-card .btn {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .tool-content {
+                flex-direction: column;
+            }
+            
+            .preview-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Image Tools Suite</h1>
+            <p>Your all-in-one solution for image generation, conversion, and optimization</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="all-tools">
+                <i class="fas fa-th"></i> All Tools
+            </button>
+            <button class="tab-btn" data-tab="image-generator">
+                <i class="fas fa-image"></i> Image Generator
+            </button>
+            <button class="tab-btn" data-tab="image-converter">
+                <i class="fas fa-exchange-alt"></i> Image Converter
+            </button>
+            <button class="tab-btn" data-tab="image-links">
+                <i class="fas fa-link"></i> Image Links
+            </button>
+            <button class="tab-btn" data-tab="image-size">
+                <i class="fas fa-expand-alt"></i> Image Size
+            </button>
+        </div>
+        
+        <!-- All Tools Dashboard -->
+        <section id="all-tools" class="tool-section active">
+            <div class="tool-header">
+                <h2>All Image Tools</h2>
+                <p>Select any tool to get started with your image processing needs</p>
+            </div>
+            
+            <div class="all-tools-grid">
+                <div class="tool-card">
+                    <i class="fas fa-image"></i>
+                    <h3>Image Generator</h3>
+                    <p>Create custom images with text, shapes, and colors</p>
+                    <button class="btn" data-tab="image-generator">Use Tool</button>
+                </div>
+                
+                <div class="tool-card">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>Image Converter</h3>
+                    <p>Convert between JPG, PNG, GIF, and WebP formats</p>
+                    <button class="btn" data-tab="image-converter">Use Tool</button>
+                </div>
+                
+                <div class="tool-card">
+                    <i class="fas fa-link"></i>
+                    <h3>Image Links</h3>
+                    <p>Extract all image URLs from any webpage</p>
+                    <button class="btn" data-tab="image-links">Use Tool</button>
+                </div>
+                
+                <div class="tool-card">
+                    <i class="fas fa-expand-alt"></i>
+                    <h3>Image Size</h3>
+                    <p>Resize and optimize images for web</p>
+                    <button class="btn" data-tab="image-size">Use Tool</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Image Generator Tool -->
+        <section id="image-generator" class="tool-section">
+            <div class="tool-header">
+                <h2>Image Generator</h2>
+                <p>Create custom images with text, background colors, and dimensions</p>
+            </div>
+            
+            <div class="tool-content">
+                <div class="tool-controls">
+                    <div class="form-group">
+                        <label for="text">Image Text</label>
+                        <input type="text" id="text" placeholder="Enter text for your image" value="Sample Image">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bgColor">Background Color</label>
+                        <input type="color" id="bgColor" value="#3498db">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="textColor">Text Color</label>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="width">Width (px)</label>
+                        <input type="number" id="width" min="100" max="2000" value="600">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="height">Height (px)</label>
+                        <input type="number" id="height" min="100" max="2000" value="400">
+                    </div>
+                    
+                    <button id="generate-btn">Generate Image</button>
+                </div>
+                
+                <div class="tool-preview">
+                    <div class="preview-container">
+                        <img id="generated-image" src="https://via.placeholder.com/600x400/3498db/ffffff?text=Sample+Image" alt="Generated Image Preview">
+                    </div>
+                    
+                    <div class="result-box">
+                        <h3>Download Your Image</h3>
+                        <p>Right-click the image and select "Save Image As" to download</p>
+                        <p>Or <button id="download-btn" style="width: auto; display: inline-block; margin-top: 10px;">Download Image</button></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Image Converter Tool -->
+        <section id="image-converter" class="tool-section">
+            <div class="tool-header">
+                <h2>Image Converter</h2>
+                <p>Convert your images between different formats</p>
+            </div>
+            
+            <div class="tool-content">
+                <div class="tool-controls">
+                    <div class="form-group">
+                        <label for="file-upload">Upload Image</label>
+                        <input type="file" id="file-upload" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="convert-format">Convert To</label>
+                        <select id="convert-format">
+                            <option value="jpg">JPG</option>
+                            <option value="png">PNG</option>
+                            <option value="webp">WebP</option>
+                            <option value="gif">GIF</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality">Quality (1-100)</label>
+                        <input type="range" id="quality" min="1" max="100" value="90">
+                        <span id="quality-value">90%</span>
+                    </div>
+                    
+                    <button id="convert-btn">Convert Image</button>
+                </div>
+                
+                <div class="tool-preview">
+                    <div class="preview-container">
+                        <img id="converted-image" src="https://via.placeholder.com/600x400/eee/999?text=Upload+an+image" alt="Converted Image Preview">
+                    </div>
+                    
+                    <div class="result-box">
+                        <h3>Conversion Result</h3>
+                        <p>Format: <span id="format-result">-</span></p>
+                        <p>File Size: <span id="size-result">-</span></p>
+                        <p><button id="download-converted" style="width: auto; display: inline-block; margin-top: 10px;">Download Converted Image</button></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Image Links Tool -->
+        <section id="image-links" class="tool-section">
+            <div class="tool-header">
+                <h2>Image Links Extractor</h2>
+                <p>Extract all image URLs from any webpage</p>
+            </div>
+            
+            <div class="tool-content">
+                <div class="tool-controls">
+                    <div class="form-group">
+                        <label for="website-url">Website URL</label>
+                        <input type="url" id="website-url" placeholder="https://example.com" value="https://example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="filter">Filter by Keyword (optional)</label>
+                        <input type="text" id="filter" placeholder="e.g., logo, banner">
+                    </div>
+                    
+                    <button id="extract-btn">Extract Image Links</button>
+                </div>
+                
+                <div class="tool-preview">
+                    <div class="result-box">
+                        <h3>Extracted Image Links</h3>
+                        <div id="links-container" style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
+                            <p style="color: #666; text-align: center; padding: 20px;">No links extracted yet. Enter a URL and click "Extract Image Links".</p>
+                        </div>
+                        <p><button id="copy-links" style="width: auto; display: inline-block; margin-top: 10px;">Copy All Links</button></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Image Size Tool -->
+        <section id="image-size" class="tool-section">
+            <div class="tool-header">
+                <h2>Image Size & Resizer</h2>
+                <p>Resize and optimize your images for web</p>
+            </div>
+            
+            <div class="tool-content">
+                <div class="tool-controls">
+                    <div class="form-group">
+                        <label for="resize-upload">Upload Image</label>
+                        <input type="file" id="resize-upload" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dimensions (px)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="resize-width" placeholder="Width" min="10" value="800">
+                            <span style="line-height: 46px;">×</span>
+                            <input type="number" id="resize-height" placeholder="Height" min="10" value="600">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maintain-aspect">
+                            <input type="checkbox" id="maintain-aspect" checked> Maintain aspect ratio
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resize-quality">Quality (1-100)</label>
+                        <input type="range" id="resize-quality" min="1" max="100" value="85">
+                        <span id="resize-quality-value">85%</span>
+                    </div>
+                    
+                    <button id="resize-btn">Resize Image</button>
+                </div>
+                
+                <div class="tool-preview">
+                    <div class="preview-container">
+                        <img id="resized-image" src="https://via.placeholder.com/800x600/eee/999?text=Upload+an+image" alt="Resized Image Preview">
+                    </div>
+                    
+                    <div class="result-box">
+                        <h3>Image Information</h3>
+                        <p>Original Size: <span id="original-size">-</span></p>
+                        <p>New Size: <span id="new-size">-</span></p>
+                        <p>Dimensions: <span id="dimensions-result">-</span></p>
+                        <p><button id="download-resized" style="width: auto; display: inline-block; margin-top: 10px;">Download Resized Image</button></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="footer">
+            <p>© 2023 Image Tools Suite | All-in-one Image Processing Tools</p>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn, .btn[data-tab]').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab button
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                if (tabId !== 'all-tools') {
+                    document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.tab-btn[data-tab="all-tools"]`).classList.add('active');
+                }
+                
+                // Show active tab content
+                document.querySelectorAll('.tool-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Image Generator functionality
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const text = document.getElementById('text').value || 'Sample Image';
+            const bgColor = document.getElementById('bgColor').value.substring(1);
+            const textColor = document.getElementById('textColor').value.substring(1);
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            
+            const imgUrl = `https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}?text=${encodeURIComponent(text)}`;
+            document.getElementById('generated-image').src = imgUrl;
+        });
+        
+        // Download generated image
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('generated-image').src;
+            link.download = 'generated-image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Quality slider update
+        document.getElementById('quality').addEventListener('input', function() {
+            document.getElementById('quality-value').textContent = this.value + '%';
+        });
+        
+        document.getElementById('resize-quality').addEventListener('input', function() {
+            document.getElementById('resize-quality-value').textContent = this.value + '%';
+        });
+        
+        // Image Converter functionality
+        document.getElementById('convert-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('file-upload');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('converted-image').src = e.target.result;
+                    document.getElementById('format-result').textContent = document.getElementById('convert-format').value.toUpperCase();
+                    document.getElementById('size-result').textContent = (file.size / 1024).toFixed(2) + ' KB';
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload an image first');
+            }
+        });
+        
+        // Download converted image
+        document.getElementById('download-converted').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('converted-image').src;
+            link.download = `converted-image.${document.getElementById('convert-format').value}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Image Links Extractor
+        document.getElementById('extract-btn').addEventListener('click', function() {
+            const url = document.getElementById('website-url').value;
+            const filter = document.getElementById('filter').value.toLowerCase();
+            
+            if (!url) {
+                alert('Please enter a valid URL');
+                return;
+            }
+            
+            // Simulate extracted links (in a real app, this would be done via a server API)
+            const sampleLinks = [
+                'https://example.com/images/logo.png',
+                'https://example.com/images/banner.jpg',
+                'https://example.com/assets/photo1.webp',
+                'https://example.com/graphics/header.svg',
+                'https://example.com/img/product-shot.png',
+                'https://example.com/backgrounds/main-bg.jpg'
+            ];
+            
+            const container = document.getElementById('links-container');
+            container.innerHTML = '';
+            
+            const filteredLinks = sampleLinks.filter(link => 
+                filter ? link.toLowerCase().includes(filter) : true
+            );
+            
+            if (filteredLinks.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No images found matching your criteria.</p>';
+                return;
+            }
+            
+            filteredLinks.forEach(link => {
+                const linkElement = document.createElement('div');
+                linkElement.style.padding = '10px';
+                linkElement.style.borderBottom = '1px solid #eee';
+                linkElement.style.display = 'flex';
+                linkElement.style.alignItems = 'center';
+                
+                const img = document.createElement('img');
+                img.src = 'https://cdn-icons-png.flaticon.com/512/136/136528.png';
+                img.alt = 'Image icon';
+                img.style.width = '24px';
+                img.style.height = '24px';
+                img.style.marginRight = '10px';
+                
+                const anchor = document.createElement('a');
+                anchor.href = link;
+                anchor.textContent = link;
+                anchor.target = '_blank';
+                anchor.style.flex = '1';
+                anchor.style.overflow = 'hidden';
+                anchor.style.textOverflow = 'ellipsis';
+                anchor.style.whiteSpace = 'nowrap';
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.style.background = 'none';
+                copyBtn.style.border = 'none';
+                copyBtn.style.cursor = 'pointer';
+                copyBtn.style.color = '#1a2a6c';
+                copyBtn.style.marginLeft = '10px';
+                
+                copyBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(link);
+                    alert('Link copied to clipboard!');
+                });
+                
+                linkElement.appendChild(img);
+                linkElement.appendChild(anchor);
+                linkElement.appendChild(copyBtn);
+                
+                container.appendChild(linkElement);
+            });
+        });
+        
+        // Copy all links
+        document.getElementById('copy-links').addEventListener('click', function() {
+            const links = Array.from(document.querySelectorAll('#links-container a'))
+                .map(a => a.href)
+                .join('\n');
+            
+            if (links) {
+                navigator.clipboard.writeText(links);
+                alert('All image links copied to clipboard!');
+            } else {
+                alert('No links to copy');
+            }
+        });
+        
+        // Image Resizer functionality
+        document.getElementById('resize-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('resize-upload');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('resized-image').src = e.target.result;
+                    document.getElementById('original-size').textContent = (file.size / 1024).toFixed(2) + ' KB';
+                    document.getElementById('new-size').textContent = (file.size / 1024 * 0.8).toFixed(2) + ' KB'; // Simulate size reduction
+                    document.getElementById('dimensions-result').textContent = 
+                        document.getElementById('resize-width').value + '×' + 
+                        document.getElementById('resize-height').value;
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload an image first');
+            }
+        });
+        
+        // Download resized image
+        document.getElementById('download-resized').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('resized-image').src;
+            link.download = 'resized-image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Maintain aspect ratio
+        document.getElementById('maintain-aspect').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('resize-height').disabled = true;
+            } else {
+                document.getElementById('resize-height').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
